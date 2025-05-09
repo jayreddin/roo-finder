@@ -46,7 +46,9 @@ body {
     color: var(--text-color);
     line-height: 1.6;
     padding: 15px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, margin-left 0.3s ease;
+    position: relative;
+    min-height: 100vh;
 }
 
 /* Hide scrollbars */
@@ -58,6 +60,15 @@ body {
 * {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
+}
+
+.main-content {
+    transition: margin-left 0.3s ease;
+    width: 100%;
+}
+
+body.console-open .main-content {
+    margin-left: 320px; /* Width of the sidebar */
 }
 
 .container {
@@ -73,8 +84,40 @@ body {
 header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 25px;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-attribution {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    margin-top: 3px;
+}
+
+.header-attribution a {
+    /* Dark grey in light mode */
+    color: #444444;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Underline the name Jamie */
+.header-attribution a span {
+    text-decoration: underline;
+}
+
+.header-attribution a:hover {
+    opacity: 0.8;
+}
+
+/* For dark mode, use light grey */
+html[data-theme='dark'] .header-attribution a {
+    color: #cccccc; 
 }
 
 .header-controls {
@@ -388,7 +431,303 @@ html[data-theme='dark'] .light-icon {
     transition: color 0.3s ease;
 }
 
+/* Developer Console Sidebar Styling */
+.dev-console-sidebar {
+    position: fixed;
+    top: 0;
+    left: -320px; /* Start offscreen */
+    width: 320px;
+    height: 100%;
+    background-color: var(--card-background);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dev-console-sidebar.open {
+    left: 0;
+}
+
+.console-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.console-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.console-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.console-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--light-gray);
+}
+
+.console-tab {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    position: relative;
+    text-align: center;
+}
+
+.console-tab.active {
+    font-weight: bold;
+    color: var(--primary-color);
+    background-color: var(--card-background);
+}
+
+.console-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.tab-content {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.console-log-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: var(--light-gray);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+#consoleLog {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.console-controls, .action-section {
+    margin-bottom: 15px;
+}
+
+.action-section {
+    padding: 15px;
+    border-radius: 6px;
+    background-color: var(--light-gray);
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
+}
+
+.action-section:last-child {
+    margin-bottom: 0;
+}
+
+.action-section h3 {
+    font-size: 1rem;
+    margin: 0 0 8px 0;
+    color: var(--text-color);
+}
+
+.action-section p {
+    font-size: 0.9rem;
+    margin: 0 0 15px 0;
+    color: var(--secondary-color);
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.log-entry {
+    margin: 4px 0;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.log-entry.info {
+    color: var(--text-color);
+}
+
+.log-entry.success {
+    color: #28a745;
+}
+
+.log-entry.warning {
+    color: #ffc107;
+}
+
+.log-entry.error {
+    color: #dc3545;
+}
+
+.log-timestamp {
+    color: var(--secondary-color);
+    margin-right: 6px;
+    font-size: 0.8rem;
+}
+
+/* Version number styling */
+.version-number {
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    position: relative;
+}
+
+.version-number:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: var(--secondary-color);
+    transition: width 0.3s ease;
+}
+
+.version-number:hover:after {
+    width: 100%;
+}
+
+/* Confirmation Modal Styling */
+.confirm-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1100;
+    justify-content: center;
+    align-items: center;
+}
+
+.confirm-dialog {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    max-width: 400px;
+    width: 90%;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.confirm-dialog h3 {
+    margin-top: 0;
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+.confirm-dialog p {
+    color: var(--text-color);
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-no {
+    background-color: var(--secondary-color);
+}
+
+.btn-yes {
+    background-color: #dc3545;
+}
+
+.btn-yes:hover {
+    background-color: #c82333;
+}
+
 /* Responsive adjustments */
+@media (max-width: 768px) {
+    .dev-console-sidebar {
+        width: 280px;
+        left: -280px;
+    }
+    
+    body.console-open .main-content {
+        margin-left: 0;
+    }
+    
+    .dev-console-sidebar.open {
+        left: 0;
+        width: 280px;
+    }
+    
+    /* Add an overlay when console is open on mobile */
+    body.console-open::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+}
+
 @media (max-width: 600px) {
     body {
         padding: 10px;
@@ -423,306 +762,4 @@ html[data-theme='dark'] .light-icon {
     #copyModeButton {
         width: 100%;
     }
-/* Add this to your existing style.css file */
-
-.header-content {
-    display: flex;
-    flex-direction: column;
-}
-
-.header-attribution {
-    font-size: 0.75rem;
-    color: var(--secondary-color);
-    margin-top: 3px;
-}
-
-.header-attribution a {
-    /* Dark grey in light mode */
-    color: #444444;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-/* Underline the name Jamie */
-.header-attribution a span {
-    text-decoration: underline;
-}
-
-.header-attribution a:hover {
-    opacity: 0.8;
-}
-
-/* For dark mode, use light grey */
-html[data-theme='dark'] .header-attribution a {
-    color: #cccccc; 
-}
-
-/* Update the existing header styles to accommodate the new structure */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 25px;
-}
-    /* Hidden Console Styling */
-.version-number {
-    cursor: pointer;
-    user-select: none;
-    display: inline-block;
-    position: relative;
-}
-
-.version-number:after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background-color: var(--secondary-color);
-    transition: width 0.3s ease;
-}
-
-.version-number:hover:after {
-    width: 100%;
-}
-
-.console-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.console-content {
-    background-color: var(--card-background);
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 80%;
-    max-width: 800px;
-    max-height: 80vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.console-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.console-header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: var(--text-color);
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--secondary-color);
-    transition: color 0.3s ease;
-}
-
-.close-btn:hover {
-    color: var(--dark-gray);
-}
-
-.console-body {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.console-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.console-tab {
-    padding: 10px 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-color);
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.console-tab.active {
-    font-weight: bold;
-    color: var(--primary-color);
-}
-
-.console-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: var(--primary-color);
-}
-
-.tab-content {
-    padding: 15px 20px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    max-height: 60vh;
-}
-
-.console-log-container {
-    flex-grow: 1;
-    overflow-y: auto;
-    background-color: var(--light-gray);
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-family: monospace;
-    font-size: 0.9rem;
-    color: var(--text-color);
-    max-height: 300px;
-}
-
-#consoleLog {
-    margin: 0;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-.console-controls, .action-section {
-    margin-bottom: 15px;
-}
-
-.action-section h3 {
-    font-size: 1rem;
-    margin: 0 0 8px 0;
-    color: var(--text-color);
-}
-
-.action-section p {
-    font-size: 0.9rem;
-    margin: 0 0 10px 0;
-    color: var(--secondary-color);
-}
-
-.btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-    margin-right: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.btn:hover {
-    background-color: var(--button-hover);
-}
-
-.log-entry {
-    margin: 2px 0;
-    padding: 2px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.log-entry.info {
-    color: var(--text-color);
-}
-
-.log-entry.success {
-    color: #28a745;
-}
-
-.log-entry.warning {
-    color: #ffc107;
-}
-
-.log-entry.error {
-    color: #dc3545;
-}
-
-.log-timestamp {
-    color: var(--secondary-color);
-    margin-right: 6px;
-    font-size: 0.8rem;
-}
-
-/* Modal for confirmation */
-.confirm-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1100;
-    justify-content: center;
-    align-items: center;
-}
-
-.confirm-dialog {
-    background-color: var(--card-background);
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    padding: 20px;
-    max-width: 400px;
-    width: 90%;
-}
-
-.confirm-dialog h3 {
-    margin-top: 0;
-    color: var(--text-color);
-}
-
-.confirm-dialog p {
-    color: var(--text-color);
-    margin-bottom: 20px;
-}
-
-.confirm-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-.btn-no {
-    background-color: var(--secondary-color);
-}
-
-.btn-yes {
-    background-color: #dc3545;
-}
-
-.btn-yes:hover {
-    background-color: #c82333;
 }
