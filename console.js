@@ -211,4 +211,84 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     });
     
-    // Clear
+    // Clear Cache button handler
+    clearCacheBtn.addEventListener('click', function() {
+        showConfirmDialog(
+            'Clear Cache',
+            'This will clear all locally stored data including your search history and preferences. Continue?',
+            function() { // Yes callback
+                logger.info('Cache clearing initiated');
+                try {
+                    // Clear all localStorage except dev console logs
+                    const devLogs = localStorage.getItem('devConsoleLogs');
+                    localStorage.clear();
+                    if (devLogs) {
+                        localStorage.setItem('devConsoleLogs', devLogs);
+                    }
+                    logger.success('Cache cleared successfully');
+                } catch (error) {
+                    logger.error('Cache clearing failed: ' + error.message);
+                }
+            }
+        );
+    });
+    
+    // Export Data button handler
+    exportDataBtn.addEventListener('click', function() {
+        logger.info('Data export initiated');
+        try {
+            const exportData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                exportData[key] = localStorage.getItem(key);
+            }
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            
+            const exportFileName = 'roo-finder-data-' + new Date().toISOString().slice(0, 10) + '.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileName);
+            linkElement.style.display = 'none';
+            
+            document.body.appendChild(linkElement);
+            linkElement.click();
+            document.body.removeChild(linkElement);
+            
+            logger.success('Data exported successfully as ' + exportFileName);
+        } catch (error) {
+            logger.error('Data export failed: ' + error.message);
+        }
+    });
+    
+    // Generic confirm dialog function
+    function showConfirmDialog(title, message, yesCallback) {
+        const titleElement = document.getElementById('confirm-title');
+        const messageElement = document.getElementById('confirm-message');
+        
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        
+        confirmModal.style.display = 'flex';
+        
+        // Handle button clicks
+        const handleYes = function() {
+            confirmYes.removeEventListener('click', handleYes);
+            confirmNo.removeEventListener('click', handleNo);
+            confirmModal.style.display = 'none';
+            yesCallback();
+        };
+        
+        const handleNo = function() {
+            confirmYes.removeEventListener('click', handleYes);
+            confirmNo.removeEventListener('click', handleNo);
+            confirmModal.style.display = 'none';
+            logger.info(title + ' operation cancelled');
+        };
+        
+        confirmYes.addEventListener('click', handleYes);
+        confirmNo.addEventListener('click', handleNo);
+    }
+});
