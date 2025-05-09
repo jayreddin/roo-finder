@@ -8,94 +8,108 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-content">
-                <h1>Roo Mode Explorer</h1>
-                <div class="header-attribution">
-                    Created by <a href="https://github.com/jayreddin" target="_blank"><span>Jamie Reddin</span></a> ‖ 2025-05-09 ‖ <span id="versionTrigger" class="version-number">V.1.0.0</span>
+    <!-- Developer Console Sidebar -->
+    <div id="devConsoleSidebar" class="dev-console-sidebar">
+        <div class="console-header">
+            <h2>Developer Console</h2>
+            <button id="closeConsole" class="close-btn">&times;</button>
+        </div>
+        <div class="console-body">
+            <div class="console-tabs">
+                <button class="console-tab active" data-tab="logs">Logs</button>
+                <button class="console-tab" data-tab="actions">Actions</button>
+            </div>
+            
+            <div class="tab-content" id="logsTab">
+                <div class="console-log-container">
+                    <pre id="consoleLog"></pre>
+                </div>
+                <div class="console-controls">
+                    <button id="clearLogs" class="btn">Clear Logs</button>
                 </div>
             </div>
-            <div class="header-controls">
-                <button id="refreshButton" class="btn-refresh" aria-label="Refresh modes">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button id="themeToggle" class="btn-theme" aria-label="Toggle theme">
-                    <i class="fas fa-sun light-icon"></i>
-                    <i class="fas fa-moon dark-icon"></i>
-                </button>
-            </div>
-        </header>
-
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search by mode name...">
-        </div>
-
-        <div class="category-container">
-            <div class="category-selector">
-                <button class="category-btn active" data-category="all">All</button>
-                <button class="category-btn" data-category="design">Design</button>
-                <button class="category-btn" data-category="dev">Development</button>
-                <button class="category-btn" data-category="framework">Frameworks</button>
-                <button class="category-btn" data-category="data">Data</button>
-                <button class="category-btn" data-category="infra">Infrastructure</button>
-                <button class="category-btn" data-category="management">Management</button>
-                <button class="category-btn" data-category="agent">Agents</button>
-                <button class="category-btn" data-category="specialist">Specialists</button>
-            </div>
-        </div>
-
-        <ul id="searchResults">
-            <!-- Search results will be populated here -->
-        </ul>
-        <div id="noResultsMessage" class="no-results" style="display: none;">No modes found.</div>
-
-        <div class="mode-display-container">
-            <span class="mode-label">Mode (Slug):</span>
-            <div id="modeNameDisplay"></div>
-            <button id="copyModeButton" disabled>Copy</button>
-        </div>
-
-        <div class="details-container" id="modeDetailsDisplay">
-            <!-- Mode details will be displayed here -->
-        </div>
-    </div>
-    
-    <!-- Hidden Console Modal -->
-    <div id="consoleModal" class="console-modal">
-        <div class="console-content">
-            <div class="console-header">
-                <h2>Developer Console</h2>
-                <button id="closeConsole" class="close-btn">&times;</button>
-            </div>
-            <div class="console-body">
-                <div class="console-tabs">
-                    <button class="console-tab active" data-tab="logs">Logs</button>
-                    <button class="console-tab" data-tab="actions">Actions</button>
+            
+            <div class="tab-content" id="actionsTab" style="display: none;">
+                <div class="action-section">
+                    <h3>Force Refresh</h3>
+                    <p>Force download the latest .roomodes file from the repository, even if your local version is newer.</p>
+                    <button id="forceRefreshBtn" class="btn">Force Refresh</button>
                 </div>
-                
-                <div class="tab-content" id="logsTab">
-                    <div class="console-log-container">
-                        <pre id="consoleLog"></pre>
-                    </div>
-                    <div class="console-controls">
-                        <button id="clearLogs" class="btn">Clear Logs</button>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="actionsTab" style="display: none;">
-                    <div class="action-section">
-                        <h3>Force Refresh</h3>
-                        <p>Force download the latest .roomodes file from the repository, even if your local version is newer.</p>
-                        <button id="forceRefreshBtn" class="btn">Force Refresh</button>
-                    </div>
-                    <div class="action-section">
-                        <h3>Local Storage Management</h3>
-                        <p>Manage cached data and settings.</p>
+                <div class="action-section">
+                    <h3>Local Storage Management</h3>
+                    <p>Manage cached data and settings.</p>
+                    <div class="btn-group">
                         <button id="clearCacheBtn" class="btn">Clear Cache</button>
                         <button id="exportDataBtn" class="btn">Export Data</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <header>
+                <div class="header-content">
+                    <h1>Roo Mode Explorer</h1>
+                    <div class="header-attribution">
+                        Created by <a href="https://github.com/jayreddin" target="_blank"><span>Jamie</span> Reddin</a> ‖ 2025-05-09 ‖ <span id="versionTrigger" class="version-number">V.1.0.0</span>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button id="refreshButton" class="btn-refresh" aria-label="Refresh modes">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button id="themeToggle" class="btn-theme" aria-label="Toggle theme">
+                        <i class="fas fa-sun light-icon"></i>
+                        <i class="fas fa-moon dark-icon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by mode name...">
+            </div>
+
+            <div class="category-container">
+                <div class="category-selector">
+                    <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="design">Design</button>
+                    <button class="category-btn" data-category="dev">Development</button>
+                    <button class="category-btn" data-category="framework">Frameworks</button>
+                    <button class="category-btn" data-category="data">Data</button>
+                    <button class="category-btn" data-category="infra">Infrastructure</button>
+                    <button class="category-btn" data-category="management">Management</button>
+                    <button class="category-btn" data-category="agent">Agents</button>
+                    <button class="category-btn" data-category="specialist">Specialists</button>
+                </div>
+            </div>
+
+            <ul id="searchResults">
+                <!-- Search results will be populated here -->
+            </ul>
+            <div id="noResultsMessage" class="no-results" style="display: none;">No modes found.</div>
+
+            <div class="mode-display-container">
+                <span class="mode-label">Mode (Slug):</span>
+                <div id="modeNameDisplay"></div>
+                <button id="copyModeButton" disabled>Copy</button>
+            </div>
+
+            <div class="details-container" id="modeDetailsDisplay">
+                <!-- Mode details will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-dialog">
+            <h3 id="confirm-title"></h3>
+            <p id="confirm-message"></p>
+            <div class="confirm-actions">
+                <button id="confirmNo" class="btn btn-no">No</button>
+                <button id="confirmYes" class="btn btn-yes">Yes</button>
             </div>
         </div>
     </div>
