@@ -7,81 +7,118 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadFullView = document.getElementById('downloadFullView');
     const selectModesView = document.getElementById('selectModesView');
 
-    const downloadFullBtn = document.getElementById('downloadFullBtn');
-    const selectModesBtn = document.getElementById('selectModesBtn');
+    // Footers for each view
+    const downloadFullFooter = document.getElementById('downloadFullFooter');
+    const selectModesFooter = document.getElementById('selectModesFooter');
+
+    const downloadFullBtn = document.getElementById('downloadFullBtn'); // Button in initial view
+    const selectModesBtn = document.getElementById('selectModesBtn');   // Button in initial view
 
     const exitDownloadFullBtn = document.getElementById('exitDownloadFullBtn');
     const exitSelectModesBtn = document.getElementById('exitSelectModesBtn');
 
+    // Role Definition Modal elements
+    const roleDefinitionModal = document.getElementById('roleDefinitionModal');
+    const closeRoleDefinitionModalBtn = document.getElementById('closeRoleDefinitionModalBtn');
+    const backRoleDefinitionModalBtn = document.getElementById('backRoleDefinitionModalBtn');
+    const roleDefinitionModalTitle = document.getElementById('roleDefinitionModalTitle');
+    const roleDefinitionModalContent = document.getElementById('roleDefinitionModalContent');
+
+
     if (!customRoomodesBtn || !customRoomodesModal || !closeCustomRoomodesModalBtn || 
         !initialView || !downloadFullView || !selectModesView ||
-        !downloadFullBtn || !selectModesBtn || !exitDownloadFullBtn || !exitSelectModesBtn) {
-        console.error('Custom Roomodes UI elements not found. Ensure IDs in index.html are correct.');
-        if (window.devLogger) window.devLogger.error('Custom Roomodes UI elements not found.');
+        !downloadFullFooter || !selectModesFooter ||
+        !downloadFullBtn || !selectModesBtn || !exitDownloadFullBtn || !exitSelectModesBtn ||
+        !roleDefinitionModal || !closeRoleDefinitionModalBtn || !backRoleDefinitionModalBtn || !roleDefinitionModalTitle || !roleDefinitionModalContent
+        ) {
+        console.error('Custom Roomodes UI or Role Definition Modal elements not found.');
+        if (window.devLogger) window.devLogger.error('Critical UI elements for modals are missing.');
         return;
     }
 
-    // Function to show the main modal
     function openModal() {
         customRoomodesModal.style.display = 'flex';
-        showInitialView(); // Reset to initial view when opening
+        showInitialView(); 
         if (window.devLogger) window.devLogger.info('Custom Roomodes modal opened.');
     }
 
-    // Function to close the main modal
     function closeModal() {
         customRoomodesModal.style.display = 'none';
         if (window.devLogger) window.devLogger.info('Custom Roomodes modal closed.');
     }
 
-    // Function to show a specific view within the modal
-    function showView(viewToShow) {
+    function showView(viewToShow, footerToShow) {
+        // Hide all views
         initialView.style.display = 'none';
         downloadFullView.style.display = 'none';
         selectModesView.style.display = 'none';
-        viewToShow.style.display = 'block';
+        // Hide all footers
+        downloadFullFooter.style.display = 'none';
+        selectModesFooter.style.display = 'none';
+
+        if (viewToShow) viewToShow.style.display = 'block';
+        if (footerToShow) footerToShow.style.display = 'flex'; // Footers use flex
     }
 
     function showInitialView() {
-        showView(initialView);
+        showView(initialView, null); // Initial view has no specific footer in the modal-footer div
     }
 
     customRoomodesBtn.addEventListener('click', openModal);
     closeCustomRoomodesModalBtn.addEventListener('click', closeModal);
-    // Close modal if user clicks outside the card
     customRoomodesModal.addEventListener('click', (event) => {
-        if (event.target === customRoomodesModal) {
-            closeModal();
-        }
+        if (event.target === customRoomodesModal) closeModal();
     });
 
-
-    // Event listeners for view navigation
     downloadFullBtn.addEventListener('click', () => {
-        showView(downloadFullView);
-        // Initialize Full Download View (call function from fullDownload.js)
-        if (window.initFullDownloadView) {
-            window.initFullDownloadView();
-        } else {
-            console.error('initFullDownloadView function not found.');
-            if(window.devLogger) window.devLogger.error('initFullDownloadView function not found.');
-        }
+        showView(downloadFullView, downloadFullFooter);
+        if (window.initFullDownloadView) window.initFullDownloadView();
+        else if(window.devLogger) window.devLogger.error('initFullDownloadView function not found.');
     });
 
     selectModesBtn.addEventListener('click', () => {
-        showView(selectModesView);
-        // Initialize Select Modes View (call function from selectModes.js)
-        if (window.initSelectModesView) {
-            window.initSelectModesView();
-        } else {
-            console.error('initSelectModesView function not found.');
-            if(window.devLogger) window.devLogger.error('initSelectModesView function not found.');
-        }
+        showView(selectModesView, selectModesFooter);
+        if (window.initSelectModesView) window.initSelectModesView();
+        else if(window.devLogger) window.devLogger.error('initSelectModesView function not found.');
     });
 
     exitDownloadFullBtn.addEventListener('click', showInitialView);
     exitSelectModesBtn.addEventListener('click', showInitialView);
 
-    // Expose functions if needed by other scripts, e.g. for programmatic closing
+    // Role Definition Modal Logic
+    function openRoleDefinitionModal(modeName, definition) {
+        roleDefinitionModalTitle.textContent = `Role: ${modeName}`;
+        
+        // Basic summarization: first paragraph or up to 300 chars.
+        let summary = definition;
+        if (definition) {
+            const firstParagraphEnd = definition.indexOf('\n\n');
+            if (firstParagraphEnd > 0 && firstParagraphEnd < 300) {
+                summary = definition.substring(0, firstParagraphEnd) + "\n...";
+            } else if (definition.length > 300) {
+                summary = definition.substring(0, 300) + "...";
+            }
+        } else {
+            summary = "No definition provided.";
+        }
+
+        roleDefinitionModalContent.innerHTML = `<p>${summary.replace(/\n/g, '<br>')}</p>`; // Simple display
+        roleDefinitionModal.style.display = 'flex';
+        if (window.devLogger) window.devLogger.info(`Role definition modal opened for ${modeName}.`);
+    }
+
+    function closeRoleDefinitionModal() {
+        roleDefinitionModal.style.display = 'none';
+        if (window.devLogger) window.devLogger.info('Role definition modal closed.');
+    }
+
+    closeRoleDefinitionModalBtn.addEventListener('click', closeRoleDefinitionModal);
+    backRoleDefinitionModalBtn.addEventListener('click', closeRoleDefinitionModal);
+    roleDefinitionModal.addEventListener('click', (event) => {
+        if (event.target === roleDefinitionModal) closeRoleDefinitionModal();
+    });
+
+    // Expose functions
     window.closeCustomRoomodesModal = closeModal;
+    window.openRoleDefinitionModal = openRoleDefinitionModal; // For selectModes.js to call
 });
