@@ -95,6 +95,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         modeDetailsDisplay.innerHTML = detailsHTML;
     }
+
+    // Function to clear mode details
+    function clearModeDetails() {
+        modeNameDisplay.textContent = '';
+        modeDetailsDisplay.innerHTML = '';
+        copyModeButton.disabled = true;
+        // Remove 'selected' class from any search results
+        document.querySelectorAll('#searchResults li').forEach(item => {
+            item.classList.remove('selected');
+        });
+    }
     
     // Enhanced function to format role definition with better layout
     function formatRoleDefinition(text) {
@@ -139,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modified search function to include category filtering
     function performSearch(query) {
         searchResults.innerHTML = '';
+        clearModeDetails(); // Clear previous details
         
         if (!query.trim() && currentCategory === 'all') {
             searchResults.style.display = 'none';
@@ -167,6 +179,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (matchingModes.length === 0) {
             searchResults.style.display = 'none';
             noResultsMessage.style.display = 'block';
+            // ClearModeDetails() is already called at the beginning, 
+            // but if you want to ensure it's cleared specifically when no results:
+            // clearModeDetails(); 
         } else {
             searchResults.style.display = 'block';
             noResultsMessage.style.display = 'none';
@@ -207,6 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Copy mode slug to clipboard
     copyModeButton.addEventListener('click', function() {
         const modeName = modeNameDisplay.textContent;
+        if (!modeName) return; // Don't attempt to copy if empty
         navigator.clipboard.writeText(modeName).then(() => {
             // Visual feedback that copy happened
             const originalText = copyModeButton.textContent;
@@ -218,14 +234,26 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Initialize with data from external file
-    roomodes = roomodesData;
+    // Ensure roomodesData is defined (e.g., from roo-commander.json script tag)
+    if (typeof roomodesData !== 'undefined') {
+        roomodes = roomodesData;
+    } else {
+        // Fallback or error handling if roomodesData is not loaded
+        console.error("roomodesData is not defined. Ensure roo-commander.json is loaded before script.js");
+        roomodes = { customModes: [] }; // Initialize with empty modes to prevent errors
+    }
     
     // Make the roomodes data available to the fetchroo.js script
     window.updateRoomodes = function(newData) {
         roomodes = newData;
         performSearch(searchInput.value); // Refresh the search results
+        clearModeDetails(); // Clear details when data is updated
     };
     
-    // Show all modes when first loading
-    performSearch('');
+    // Show all modes when first loading (or clear details if no query and 'all' category)
+    performSearch(''); 
+    // If you prefer the details to be empty on initial load without any interaction:
+    // clearModeDetails(); 
+    // searchResults.style.display = 'none';
+    // noResultsMessage.style.display = 'none';
 });
