@@ -8,7 +8,7 @@ Roo Mode Explorer is an interactive web tool that helps you browse, search, and 
 
 ## 🔖 Version
 
-**Current Version:** v1.1.0 (May 2025) <!-- Assuming a version bump for new features -->
+**Current Version:** v1.2.0 (May 2025) <!-- Assuming a version bump for new features -->
 
 ## ✨ Features
 
