@@ -14,73 +14,59 @@ document.addEventListener('DOMContentLoaded', function() {
     const refreshButton = document.getElementById('refreshButton');
     const categoryButtons = document.querySelectorAll('.category-btn');
     
-    // Initialize theme based on user preference or default to light
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
     
-    // Theme toggle functionality
     themeToggle.addEventListener('click', function() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
     });
     
-    // Refresh button functionality
     refreshButton.addEventListener('click', function() {
-        // Call the fetch function from fetchroo.js
         fetchLatestRooModes();
     });
     
-    // Category filtering functionality
     categoryButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Remove active class from all buttons
             categoryButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
             this.classList.add('active');
-            
-            // Set current category
             currentCategory = this.dataset.category;
-            
-            // Perform search with current input value
             performSearch(searchInput.value);
         });
     });
     
-    // Function to categorize modes based on slug pattern
     function getCategoryFromSlug(slug) {
+        // Existing categories
         if (slug.startsWith('design-')) return 'design';
         if (slug.startsWith('dev-')) return 'dev';
         if (slug.startsWith('framework-')) return 'framework';
         if (slug.startsWith('data-')) return 'data';
-        if (slug.startsWith('infra-')) return 'infra';
-        if (slug.startsWith('auth-') || slug.startsWith('cloud-') || slug.startsWith('edge-') || slug.startsWith('baas-')) return 'infra';
+        if (slug.startsWith('infra-') || slug.startsWith('auth-') || slug.startsWith('cloud-') || slug.startsWith('edge-') || slug.startsWith('baas-')) return 'infra';
         if (slug.startsWith('manager-') || slug.startsWith('lead-')) return 'management';
         if (slug.startsWith('agent-')) return 'agent';
         if (slug.startsWith('spec-') || slug.startsWith('test-') || slug.startsWith('cms-')) return 'specialist';
         
-        // Default for other types or special cases
+        // Add new category slug logic if needed, e.g.:
+        // if (slug.startsWith('plan-')) return 'plan';
+        // if (slug.startsWith('debug-')) return 'debug';
+
         if (slug === 'roo-commander') return 'management';
         if (slug === 'core-architect') return 'management';
         
-        return 'other';
+        return 'other'; // Default or fallback category
     }
     
-    // Function to display mode details with enhanced formatting
     function displayModeDetails(mode) {
         modeNameDisplay.textContent = mode.slug;
         copyModeButton.disabled = false;
         
-        // Determine category for badge display
         const category = getCategoryFromSlug(mode.slug);
         
-        // Format the details display with improved role definition layout
         let detailsHTML = `
             <h2>${mode.name}</h2>
-            <div class="badge-category">
+            <div class="badge-category" style="margin-bottom: 10px;">
                 <span class="badge badge-category">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
             </div>
             <h3>Role Definition:</h3>
@@ -92,37 +78,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${mode.groups.map(group => `<span class="badge">${group}</span>`).join('')}
             </div>
         `;
-        
         modeDetailsDisplay.innerHTML = detailsHTML;
     }
 
-    // Function to clear mode details
     function clearModeDetails() {
         modeNameDisplay.textContent = '';
         modeDetailsDisplay.innerHTML = '';
         copyModeButton.disabled = true;
-        // Remove 'selected' class from any search results
         document.querySelectorAll('#searchResults li').forEach(item => {
             item.classList.remove('selected');
         });
     }
     
-    // Enhanced function to format role definition with better layout
     function formatRoleDefinition(text) {
-        // Replace truncated text
+        if (!text) return '<p>No role definition provided.</p>';
         text = text.includes('[...]') ? text.replace('[...]', '... (truncated)') : text;
-        
-        // Format paragraphs
         let formatted = '';
-        
-        // Convert bullet points or lists
         if (text.includes('\n-')) {
             const parts = text.split('\n-');
             const firstParagraph = parts[0].trim();
+            if (firstParagraph) formatted += `<p>${firstParagraph}</p>`;
             const listItems = parts.slice(1);
-            
-            formatted += `<p>${firstParagraph}</p>`;
-            
             if (listItems.length > 0) {
                 formatted += '<ul>';
                 listItems.forEach(item => {
@@ -131,26 +107,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 formatted += '</ul>';
             }
         } else if (text.includes('\n\n')) {
-            // Multiple paragraphs
             const paragraphs = text.split('\n\n');
             paragraphs.forEach(para => {
-                formatted += `<p>${para.trim()}</p>`;
+                if (para.trim()) formatted += `<p>${para.trim()}</p>`;
             });
         } else {
-            // Single paragraph
-            formatted = `<p>${text}</p>`;
+            formatted = `<p>${text.trim()}</p>`;
         }
-        
-        // Highlight key terms
         formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
         return formatted;
     }
     
-    // Modified search function to include category filtering
     function performSearch(query) {
         searchResults.innerHTML = '';
-        clearModeDetails(); // Clear previous details
+        clearModeDetails(); 
         
         if (!query.trim() && currentCategory === 'all') {
             searchResults.style.display = 'none';
@@ -161,15 +131,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const lowerQuery = query.toLowerCase();
         let matchingModes = roomodes.customModes;
         
-        // Filter by search query if provided
         if (query.trim()) {
             matchingModes = matchingModes.filter(mode => 
                 mode.name.toLowerCase().includes(lowerQuery) || 
-                mode.slug.toLowerCase().includes(lowerQuery)
+                mode.slug.toLowerCase().includes(lowerQuery) ||
+                (mode.groups && mode.groups.some(group => group.toLowerCase().includes(lowerQuery))) // Search in groups too
             );
         }
         
-        // Filter by category if not 'all'
         if (currentCategory !== 'all') {
             matchingModes = matchingModes.filter(mode => 
                 getCategoryFromSlug(mode.slug) === currentCategory
@@ -179,34 +148,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (matchingModes.length === 0) {
             searchResults.style.display = 'none';
             noResultsMessage.style.display = 'block';
-            // ClearModeDetails() is already called at the beginning, 
-            // but if you want to ensure it's cleared specifically when no results:
-            // clearModeDetails(); 
         } else {
             searchResults.style.display = 'block';
             noResultsMessage.style.display = 'none';
-            
             matchingModes.forEach(mode => {
                 const li = document.createElement('li');
-                
-                // Extract emoji if present in the name
                 const nameMatch = mode.name.match(/^([\u{1F300}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}])\s+(.+)$/u);
-                
                 if (nameMatch) {
-                    // Create with emoji
                     li.innerHTML = `<span class="mode-emoji">${nameMatch[1]}</span>${nameMatch[2]} <small>(${mode.slug})</small>`;
                 } else {
-                    // No emoji found
                     li.textContent = `${mode.name} (${mode.slug})`;
                 }
-                
                 li.addEventListener('click', () => {
                     displayModeDetails(mode);
-                    // Remove selected class from all items
-                    document.querySelectorAll('#searchResults li').forEach(item => {
-                        item.classList.remove('selected');
-                    });
-                    // Add selected class to clicked item
+                    document.querySelectorAll('#searchResults li').forEach(item => item.classList.remove('selected'));
                     li.classList.add('selected');
                 });
                 searchResults.appendChild(li);
@@ -214,46 +169,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Event listener for search input
     searchInput.addEventListener('input', function() {
         performSearch(this.value);
     });
     
-    // Copy mode slug to clipboard
     copyModeButton.addEventListener('click', function() {
         const modeName = modeNameDisplay.textContent;
-        if (!modeName) return; // Don't attempt to copy if empty
+        if (!modeName) return; 
         navigator.clipboard.writeText(modeName).then(() => {
-            // Visual feedback that copy happened
-            const originalText = copyModeButton.textContent;
-            copyModeButton.textContent = 'Copied!';
+            const originalIcon = copyModeButton.innerHTML; // Store full HTML (icon + text)
+            copyModeButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
             setTimeout(() => {
-                copyModeButton.textContent = originalText;
+                copyModeButton.innerHTML = originalIcon;
             }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            if(window.devLogger) window.devLogger.error('Failed to copy slug: ' + err.message);
         });
     });
     
-    // Initialize with data from external file
-    // Ensure roomodesData is defined (e.g., from roo-commander.json script tag)
     if (typeof roomodesData !== 'undefined') {
         roomodes = roomodesData;
     } else {
-        // Fallback or error handling if roomodesData is not loaded
-        console.error("roomodesData is not defined. Ensure roo-commander.json is loaded before script.js");
-        roomodes = { customModes: [] }; // Initialize with empty modes to prevent errors
+        console.error("roomodesData is not defined.");
+        roomodes = { customModes: [] }; 
     }
     
-    // Make the roomodes data available to the fetchroo.js script
     window.updateRoomodes = function(newData) {
         roomodes = newData;
-        performSearch(searchInput.value); // Refresh the search results
-        clearModeDetails(); // Clear details when data is updated
+        performSearch(searchInput.value); 
+        clearModeDetails(); 
     };
     
-    // Show all modes when first loading (or clear details if no query and 'all' category)
     performSearch(''); 
-    // If you prefer the details to be empty on initial load without any interaction:
-    // clearModeDetails(); 
-    // searchResults.style.display = 'none';
-    // noResultsMessage.style.display = 'none';
 });
