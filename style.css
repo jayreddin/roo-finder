@@ -437,24 +437,24 @@ html[data-theme='dark'] .light-icon {
 }
 
 .header-attribution a {
-    /* Customize the link color here */
-    color: #2ecc71; /* This is a nice green color, but you can use any color you prefer */
+    /* Dark grey in light mode */
+    color: #444444;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
-.header-attribution a:hover {
+/* Underline the name Jamie */
+.header-attribution a span {
     text-decoration: underline;
-    color: #27ae60; /* Slightly darker green for hover state */
 }
 
-/* For dark mode, we can specify a different color if needed */
+.header-attribution a:hover {
+    opacity: 0.8;
+}
+
+/* For dark mode, use light grey */
 html[data-theme='dark'] .header-attribution a {
-    color: #3cd483; /* Brighter green for dark mode */
-}
-
-html[data-theme='dark'] .header-attribution a:hover {
-    color: #2ecc71; /* Slightly darker on hover */
+    color: #cccccc; 
 }
 
 /* Update the existing header styles to accommodate the new structure */
@@ -463,5 +463,4 @@ header {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 25px;
-}
 }
