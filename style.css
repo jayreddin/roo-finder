@@ -12,12 +12,14 @@
     --search-result-selected: #007bff;
     --search-result-selected-text: #ffffff;
     --button-hover: #0056b3;
+    --button-secondary-hover: #5a6268;
     --role-definition-bg: #f8f9fa;
     --category-active-bg: #007bff;
     --category-active-text: #ffffff;
     --category-hover-bg: #e2e6ea;
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --modal-overlay-bg: rgba(0, 0, 0, 0.6);
+    --progress-bar-bg: #28a745; /* Green for progress bar */
 }
 
 /* Dark theme */
@@ -34,11 +36,13 @@ html[data-theme='dark'] {
     --search-result-selected: #0d6efd;
     --search-result-selected-text: #ffffff;
     --button-hover: #0b5ed7;
+    --button-secondary-hover: #98a0a7;
     --role-definition-bg: #2c3136;
     --category-active-bg: #0d6efd;
     --category-active-text: #ffffff;
     --category-hover-bg: #495057;
     --modal-overlay-bg: rgba(0, 0, 0, 0.7);
+    --progress-bar-bg: #2db950; /* Slightly brighter green for dark mode */
 }
 
 body {
@@ -51,18 +55,32 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease, margin-left 0.3s ease;
     position: relative;
     min-height: 100vh;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
 }
 
 /* Hide scrollbars */
 ::-webkit-scrollbar {
-    width: 0;
-    height: 0;
+    width: 8px; /* Make scrollbars subtle if shown */
+    height: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+    background: var(--light-gray);
 }
 
 * {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: var(--secondary-color) var(--light-gray); /* Firefox */
+    /* -ms-overflow-style: none;  IE and Edge - consider if needed */
 }
+
 
 .main-content {
     transition: margin-left 0.3s ease;
@@ -86,8 +104,10 @@ body.console-open .main-content {
 header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center; /* Align items vertically */
     margin-bottom: 25px;
+    flex-wrap: wrap; /* Allow header items to wrap on small screens */
+    gap: 10px;
 }
 
 .header-content {
@@ -102,39 +122,35 @@ header {
 }
 
 .header-attribution a {
-    /* Dark grey in light mode */
-    color: #444444;
+    color: var(--text-color); /* Adjusted for better visibility */
     text-decoration: none;
     transition: color 0.3s ease;
 }
-
-/* Underline the name Jamie */
-.header-attribution a span {
-    text-decoration: underline;
-}
-
-.header-attribution a:hover {
-    opacity: 0.8;
-}
-
-/* For dark mode, use light grey */
 html[data-theme='dark'] .header-attribution a {
-    color: #cccccc; 
+    color: var(--light-gray); 
 }
+.header-attribution a span { text-decoration: underline; }
+.header-attribution a:hover { opacity: 0.8; }
+
 
 .header-controls {
     display: flex;
-    gap: 10px; /* Adjusted gap for new button */
+    gap: 10px;
     align-items: center;
 }
 
 h1 {
-    color: var(--dark-gray);
-    margin: 0;
+    color: var(--dark-gray); /* Should be --text-color or a specific heading color */
+    margin: 0 0 5px 0; /* Adjusted margin */
     transition: color 0.3s ease;
+    font-size: 1.8rem; /* Slightly larger */
+}
+html[data-theme='dark'] h1 {
+    color: var(--text-color);
 }
 
-.btn, #copyModeButton, .btn-refresh, .btn-theme {
+
+.btn, .btn-refresh, .btn-theme { /* Combined base style for all primary action buttons */
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -142,614 +158,185 @@ h1 {
     cursor: pointer;
     padding: 8px 15px;
     font-size: 0.95rem;
-    transition: all 0.3s ease;
-    display: flex;
+    transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.2s ease;
+    display: inline-flex; /* Use inline-flex for better icon alignment */
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    border: 2px solid transparent;
-    height: 38px; /* Standard height */
+    gap: 8px; /* Increased gap */
+    border: 1px solid transparent; /* For hover/focus consistency */
+    height: 38px; 
+    line-height: 1.5; /* Ensure text is centered vertically */
+    text-decoration: none; /* For <a> styled as button */
 }
 
-.btn:hover, #copyModeButton:hover, .btn-refresh:hover, .btn-theme:hover {
+.btn:hover, .btn-refresh:hover, .btn-theme:hover {
     background-color: var(--button-hover);
+    opacity: 0.9;
+}
+.btn:active, .btn-refresh:active, .btn-theme:active {
+    transform: translateY(1px);
 }
 
-.btn-theme {
-    width: 38px; /* Fixed width for icon button */
-    height: 38px;
-    padding: 0;
-    font-size: 1.2rem;
+
+.btn-secondary { /* Style for secondary buttons like Exit */
+    background-color: var(--secondary-color);
+}
+.btn-secondary:hover {
+    background-color: var(--button-secondary-hover);
 }
 
-.btn-refresh {
-    height: 38px;
+
+.btn-theme { /* Specific for theme toggle */
+    width: 38px;
+    padding: 0; /* Remove padding if fixed width/height */
 }
 
-.btn-refresh i, .btn-theme i, .btn i { /* Added .btn i for new button icon */
+.btn i, .btn-refresh i, .btn-theme i {
     font-size: 1.1rem; 
 }
 
-
-.btn-refresh.checking {
-    animation: checking 1s infinite;
+#copyModeButton { /* Now uses .btn, specific overrides if any */
+    min-width: 100px; /* Example specific override */
+}
+#copyModeButton:disabled {
+    background-color: var(--light-gray);
+    color: var(--secondary-color);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+html[data-theme='dark'] #copyModeButton:disabled {
+     background-color: var(--border-color);
 }
 
-.btn-refresh.success {
-    animation: success-pulse 1.5s;
-}
 
-.btn-refresh.no-update {
-    animation: no-update-pulse 1.5s;
-}
+.btn-refresh.checking { animation: checking 1s infinite; }
+.btn-refresh.success { animation: success-pulse 1.5s; }
+.btn-refresh.no-update { animation: no-update-pulse 1.5s; }
 
-@keyframes checking {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
+@keyframes checking { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 @keyframes success-pulse {
     0% { border-color: transparent; box-shadow: none; }
-    25% { border-color: #28a745; box-shadow: 0 0 8px rgba(40, 167, 69, 0.8); }
-    75% { border-color: #28a745; box-shadow: 0 0 8px rgba(40, 167, 69, 0.8); }
+    25% { border-color: var(--progress-bar-bg); box-shadow: 0 0 8px var(--progress-bar-bg); }
+    75% { border-color: var(--progress-bar-bg); box-shadow: 0 0 8px var(--progress-bar-bg); }
     100% { border-color: transparent; box-shadow: none; }
 }
+@keyframes no-update-pulse { /* ... existing ... */ }
 
-@keyframes no-update-pulse {
-    0% { border-color: transparent; box-shadow: none; }
-    25% { border-color: #dc3545; box-shadow: 0 0 8px rgba(220, 53, 69, 0.8); }
-    75% { border-color: #dc3545; box-shadow: 0 0 8px rgba(220, 53, 69, 0.8); }
-    100% { border-color: transparent; box-shadow: none; }
-}
+html[data-theme='light'] .dark-icon { display: none; }
+html[data-theme='dark'] .light-icon { display: none; }
 
-html[data-theme='light'] .dark-icon {
-    display: none;
-}
-
-html[data-theme='dark'] .light-icon {
-    display: none;
-}
-
-.search-container {
-    margin-bottom: 20px;
-}
-
+.search-container { margin-bottom: 20px; }
 #searchInput {
     width: 100%;
     padding: 12px 15px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 1rem; /* Standardized font size */
     box-sizing: border-box;
     background-color: var(--card-background);
     color: var(--text-color);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
-
-#searchInput:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-.category-container {
-    margin-bottom: 20px;
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-
-.category-selector {
-    display: flex;
-    gap: 8px;
-    padding-bottom: 8px;
-}
-
-.category-btn {
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    background-color: var(--card-background);
-    color: var(--text-color);
-    cursor: pointer;
-    font-size: 14px;
-    white-space: nowrap;
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.category-btn:hover {
-    background-color: var(--category-hover-bg);
-}
-
-.category-btn.active {
-    background-color: var(--category-active-bg);
-    color: var(--category-active-text);
-    border-color: var(--category-active-bg);
-}
-
-#searchResults {
-    list-style-type: none;
-    padding: 0;
-    margin: 10px 0 20px 0;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background-color: var(--card-background);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    scrollbar-width: none;
-}
-
-#searchResults li {
-    padding: 10px 15px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border-color);
-    background-color: var(--card-background);
-    color: var(--text-color);
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-#searchResults li:last-child {
-    border-bottom: none;
-}
-
-#searchResults li:hover {
-    background-color: var(--search-result-hover);
-}
-
-#searchResults li.selected {
-    background-color: var(--search-result-selected);
-    color: var(--search-result-selected-text);
-}
-
-.mode-display-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: var(--light-gray);
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    min-height: 44px;
-}
-
-.mode-label {
-    font-weight: bold;
-    color: var(--secondary-color);
-    transition: color 0.3s ease;
-    white-space: nowrap;
-}
-
-#modeNameDisplay {
-    flex-grow: 1;
-    padding: 8px;
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-family: monospace;
-    overflow-x: auto; /* In case slug is very long */
-    white-space: nowrap;
-    color: var(--text-color);
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    min-height: 20px;
-}
-
-#copyModeButton {
-    padding: 8px 15px;
-    white-space: nowrap;
-    min-width: 80px;
-}
-
-#copyModeButton:disabled {
-    background-color: #aaaacc; /* Lighter shade for disabled state */
-    cursor: not-allowed;
-}
-
-.details-container {
-    padding: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background-color: var(--card-background);
-    min-height: 100px;
-    max-height: 400px; /* Or more if needed */
-    overflow-y: auto;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    scrollbar-width: none;
-}
-
-.details-container h2, .details-container h3 {
-    margin-top: 0.5em;
-    margin-bottom: 0.3em;
-    color: var(--dark-gray);
-    transition: color 0.3s ease;
-}
-
-.details-container ul {
-    padding-left: 20px;
-    margin-top: 0.2em;
-    margin-bottom: 0.5em;
-}
-
-.details-container li {
-    margin-bottom: 0.2em;
-}
-
-.details-container strong {
-    font-weight: 600; /* Slightly bolder */
-}
-
-.role-definition {
-    background-color: var(--role-definition-bg);
-    padding: 15px;
-    border-radius: 6px;
-    margin: 10px 0;
-    line-height: 1.5;
-    font-size: 1rem;
-    border-left: 4px solid var(--primary-color);
-    transition: background-color 0.3s ease, border-left-color 0.3s ease;
-}
-
-.role-definition p {
-    margin: 0 0 10px 0;
-}
-
-.role-definition ul {
-    margin-top: 10px;
-}
-
-.badge {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    background-color: var(--primary-color);
-    color: white;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.badge-groups {
-    margin-top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-.badge-category {
-    background-color: var(--secondary-color);
-}
-
-.mode-emoji {
-    margin-right: 5px;
-    font-size: 1.2em;
-}
-
-.no-results {
-    padding: 10px 15px;
-    color: var(--secondary-color);
-    text-align: center;
-    transition: color 0.3s ease;
-}
-
-/* Developer Console Sidebar Styling */
-.dev-console-sidebar {
-    position: fixed;
-    top: 0;
-    left: -320px; /* Start offscreen */
-    width: 320px;
-    height: 100%;
-    background-color: var(--card-background);
-    border-right: 1px solid var(--border-color);
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    transition: left 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.dev-console-sidebar.open {
-    left: 0;
-}
-
-.console-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.console-header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    color: white;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: white;
-    transition: color 0.3s ease;
-}
-
-.close-btn:hover {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.console-body {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.console-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border-color);
-    background-color: var(--light-gray);
-}
-
-.console-tab {
-    flex: 1;
-    padding: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-color);
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    position: relative;
-    text-align: center;
-}
-
-.console-tab.active {
-    font-weight: bold;
-    color: var(--primary-color);
-    background-color: var(--card-background);
-}
-
-.console-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: var(--primary-color);
-}
-
-.tab-content {
-    padding: 15px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-}
-
-.console-log-container {
-    flex-grow: 1;
-    overflow-y: auto;
-    background-color: var(--light-gray);
-    border-radius: 6px;
-    padding: 10px;
-    margin-bottom: 15px;
-    font-family: monospace;
-    font-size: 0.9rem;
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-
-#consoleLog {
-    margin: 0;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-.console-controls, .action-section {
-    margin-bottom: 15px;
-}
-
-.action-section {
-    padding: 15px;
-    border-radius: 6px;
-    background-color: var(--light-gray);
-    border: 1px solid var(--border-color);
-    margin-bottom: 15px;
-}
-
-.action-section:last-child {
-    margin-bottom: 0;
-}
-
-.action-section h3 {
-    font-size: 1rem;
-    margin: 0 0 8px 0;
-    color: var(--text-color);
-}
-
-.action-section p {
-    font-size: 0.9rem;
-    margin: 0 0 15px 0;
-    color: var(--secondary-color);
-}
-
-.btn-group {
-    display: flex;
-    gap: 10px;
-}
-
-.log-entry {
-    margin: 4px 0;
-    padding: 4px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.log-entry.info {
-    color: var(--text-color);
-}
-
-.log-entry.success {
-    color: #28a745;
-}
-
-.log-entry.warning {
-    color: #ffc107;
-}
-
-.log-entry.error {
-    color: #dc3545;
-}
-
-.log-timestamp {
-    color: var(--secondary-color);
-    margin-right: 6px;
-    font-size: 0.8rem;
-}
-
-/* Version number styling */
-.version-number {
-    cursor: pointer;
-    user-select: none;
-    display: inline-block;
-    position: relative;
-}
-
-.version-number:after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background-color: var(--secondary-color);
-    transition: width 0.3s ease;
-}
-
-.version-number:hover:after {
-    width: 100%;
-}
-
-/* Confirmation Modal Styling */
-.confirm-modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--modal-overlay-bg); /* Use variable for overlay */
-    z-index: 1100;
-    justify-content: center;
-    align-items: center;
-    animation: fadeInOverlay 0.3s ease; /* Animation for overlay */
-}
-
-.confirm-dialog {
-    background-color: var(--card-background);
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    padding: 25px; /* Increased padding */
-    max-width: 450px; /* Slightly wider */
-    width: 90%;
-    animation: fadeInDialog 0.3s ease-out; /* Dialog animation */
-    border: 1px solid var(--border-color); /* Add border */
-}
-
-@keyframes fadeInOverlay {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes fadeInDialog {
-    from {
-        opacity: 0;
-        transform: translateY(-30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.confirm-dialog h3 {
-    margin-top: 0;
-    margin-bottom: 15px; /* More space below title */
-    color: var(--text-color);
-    font-size: 1.3rem; /* Larger title */
-}
-
-.confirm-dialog p {
-    color: var(--text-color);
-    margin-bottom: 25px; /* More space below message */
-    font-size: 1rem; /* Larger text */
-    line-height: 1.5;
-}
-
-.confirm-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px; /* Increased gap */
-}
-
-.btn-no, .btn-yes { /* General styling for modal buttons */
-    padding: 10px 20px;
-    font-size: 0.95rem;
-}
-
-.btn-no {
-    background-color: var(--secondary-color);
-}
-.btn-no:hover {
-    background-color: var(--button-hover); /* Use a darker shade of secondary or a generic hover */
-    opacity: 0.9;
-}
-
-
-.btn-yes {
-    background-color: #dc3545; /* Red for destructive actions */
-}
-
-.btn-yes:hover {
-    background-color: #c82333;
-}
-
-
-/* Custom .roomodes Modal Styling */
+#searchInput:focus { /* ... existing ... */ }
+
+.category-container { /* ... existing ... */ }
+.category-selector { /* ... existing ... */ }
+.category-btn { /* ... existing ... */ }
+.category-btn:hover { /* ... existing ... */ }
+.category-btn.active { /* ... existing ... */ }
+
+#searchResults { /* ... existing ... */ }
+#searchResults li { /* ... existing ... */ }
+#searchResults li:last-child { border-bottom: none; }
+#searchResults li:hover { background-color: var(--search-result-hover); }
+#searchResults li.selected { background-color: var(--search-result-selected); color: var(--search-result-selected-text); }
+
+.mode-display-container { /* ... existing ... */ }
+.mode-label { /* ... existing ... */ }
+#modeNameDisplay { /* ... existing ... */ }
+
+.details-container { /* ... existing ... */ }
+.details-container h2, .details-container h3 { /* ... existing ... */ }
+.details-container ul { /* ... existing ... */ }
+.details-container li { /* ... existing ... */ }
+.details-container strong { /* ... existing ... */ }
+.role-definition { /* ... existing ... */ }
+.role-definition p { /* ... existing ... */ }
+.role-definition ul { /* ... existing ... */ }
+.badge { /* ... existing ... */ }
+.badge-groups { /* ... existing ... */ }
+.badge-category { background-color: var(--secondary-color); }
+.mode-emoji { /* ... existing ... */ }
+.no-results { /* ... existing ... */ }
+
+/* Developer Console Sidebar Styling */ /* ... existing ... */
+.dev-console-sidebar { /* ... existing ... */ }
+.dev-console-sidebar.open { /* ... existing ... */ }
+.console-header { /* ... existing ... */ }
+.console-header h2 { /* ... existing ... */ }
+.close-btn { /* ... existing ... */ }
+.close-btn:hover { /* ... existing ... */ }
+.console-body { /* ... existing ... */ }
+.console-tabs { /* ... existing ... */ }
+.console-tab { /* ... existing ... */ }
+.console-tab.active { /* ... existing ... */ }
+.console-tab.active::after { /* ... existing ... */ }
+.tab-content { /* ... existing ... */ }
+.console-log-container { /* ... existing ... */ }
+#consoleLog { /* ... existing ... */ }
+.console-controls, .action-section { /* ... existing ... */ }
+.action-section { /* ... existing ... */ }
+.action-section:last-child { /* ... existing ... */ }
+.action-section h3 { /* ... existing ... */ }
+.action-section p { /* ... existing ... */ }
+.btn-group { /* ... existing ... */ }
+.log-entry { /* ... existing ... */ }
+.log-entry.info { /* ... existing ... */ }
+.log-entry.success { /* ... existing ... */ }
+.log-entry.warning { /* ... existing ... */ }
+.log-entry.error { /* ... existing ... */ }
+.log-timestamp { /* ... existing ... */ }
+.version-number { /* ... existing ... */ }
+.version-number:after { /* ... existing ... */ }
+.version-number:hover:after { /* ... existing ... */ }
+
+/* Confirmation Modal Styling */ /* ... existing, minor tweaks if needed from previous pass ... */
+.confirm-modal { /* ... existing ... */ }
+.confirm-dialog { /* ... existing ... */ }
+@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInDialog { from { opacity: 0; transform: translateY(-30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.confirm-dialog h3 { /* ... existing ... */ }
+.confirm-dialog p { /* ... existing ... */ }
+.confirm-actions { /* ... existing ... */ }
+.btn-no { background-color: var(--secondary-color); }
+.btn-yes { background-color: #dc3545; }
+.btn-yes:hover { background-color: #c82333; }
+
+
+/* Custom .roomodes & Role Definition Modal Styling */
 .modal-overlay {
-    display: none; /* Hidden by default */
+    display: none; 
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background-color: var(--modal-overlay-bg);
-    z-index: 1050; /* Ensure it's above other content but below confirm modal if needed */
+    z-index: 1050; 
     justify-content: center;
     align-items: center;
     animation: fadeInOverlay 0.3s ease;
-    overflow-y: auto; /* Allow scrolling if card is too tall */
-    padding: 20px; /* Add padding for smaller screens */
+    padding: 20px; 
 }
 
 .modal-card {
     background-color: var(--card-background);
     border-radius: 8px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    width: 90%;
-    max-width: 600px; /* Max width for the card */
+    width: 100%; /* Full width within padding */
+    max-width: 650px; /* Slightly wider max */
     animation: fadeInDialog 0.3s ease-out;
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    max-height: 90vh; /* Max height to prevent overflow */
+    max-height: calc(100vh - 40px); /* Max height considering padding */
 }
 
 .modal-header {
@@ -758,61 +345,69 @@ html[data-theme='dark'] .light-icon {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0; /* Prevent header from shrinking */
 }
 
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    color: var(--text-color);
-}
+.modal-header h2 { margin: 0; font-size: 1.4rem; color: var(--text-color); }
 
 .close-modal-btn {
-    background: none;
-    border: none;
-    font-size: 1.8rem;
-    cursor: pointer;
-    color: var(--secondary-color);
-    transition: color 0.3s ease;
-    padding: 5px;
-    line-height: 1;
+    background: none; border: none; font-size: 1.8rem; cursor: pointer;
+    color: var(--secondary-color); transition: color 0.3s ease;
+    padding: 5px; line-height: 1;
 }
+.close-modal-btn:hover { color: var(--text-color); }
 
-.close-modal-btn:hover {
-    color: var(--text-color);
-}
-
-.modal-content {
+.modal-body {
     padding: 20px;
-    overflow-y: auto; /* Allow content to scroll if it exceeds card height */
-    flex-grow: 1;
+    overflow-y: auto; 
+    flex-grow: 1; /* Allow body to take available space and scroll */
+}
+.modal-view { /* Class for different views within modal body */
+    display: none; /* Hidden by default, shown by JS */
+}
+.modal-view.active {
+    display: block;
 }
 
-.modal-content p {
-    margin-bottom: 15px;
-    line-height: 1.6;
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right by default */
+    gap: 10px;
+    flex-shrink: 0; /* Prevent footer from shrinking */
+    background-color: var(--card-background); /* Ensure footer bg matches card */
+}
+/* Specific footer alignments if needed */
+#downloadFullFooter, #selectModesFooter {
+    display: none; /* Controlled by JS */
+    width: 100%; /* Take full width of footer */
+    justify-content: space-between; /* Example: space out buttons */
+}
+#selectModesFooter .btn:first-child { /* Example: if Save is on left, Exit on right */
+    margin-right: auto;
 }
 
-.modal-btn {
+
+.modal-content p { margin-bottom: 15px; line-height: 1.6; } /* old, .modal-body now primary */
+
+.modal-btn { /* General button style within modals, inherits from .btn */
+    width: auto; /* Allow button to size to content or be controlled by flex */
+    margin-top: 0; /* Remove default top margin */
+}
+/* Ensure modal buttons take full width if they are the only item in a flex line */
+.modal-body .btn.modal-btn { /* For buttons directly in modal-body like initial view */
     width: 100%;
-    margin-top: 10px;
-    padding: 12px 15px; /* Larger buttons */
-    font-size: 1rem;
+    margin-bottom: 10px; /* Add some space between full-width buttons */
+}
+.modal-body .btn.modal-btn:last-child {
+    margin-bottom: 0;
 }
 
-.modal-btn:first-of-type {
-    margin-top: 0;
-}
-
-.modal-exit-btn {
-    margin-top: 20px;
-    background-color: var(--secondary-color);
-}
-.modal-exit-btn:hover {
-    opacity: 0.9;
-}
 
 .scrollable-list {
-    max-height: 300px;
+    max-height: 280px; /* Adjusted height */
     overflow-y: auto;
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -820,148 +415,107 @@ html[data-theme='dark'] .light-icon {
     margin-bottom: 15px;
     background-color: var(--light-gray);
 }
-
 .scrollable-list .list-item {
     padding: 8px 10px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px; /* Space between checkbox/label and role button */
 }
-.scrollable-list .list-item:last-child {
-    border-bottom: none;
+.scrollable-list .list-item:last-child { border-bottom: none; }
+.scrollable-list .list-item label { flex-grow: 1; cursor: pointer; }
+.scrollable-list .list-item input[type="checkbox"] { margin-right: 10px; cursor: pointer; flex-shrink: 0; }
+.scrollable-list .release-link { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+.scrollable-list .release-link:hover { text-decoration: underline; }
+.scrollable-list .release-details { font-size: 0.85rem; color: var(--secondary-color); margin-left: 10px; }
+.btn-role { /* Style for the new "Role" button in select modes */
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    background-color: var(--secondary-color);
+    color: white;
+    flex-shrink: 0;
 }
-.scrollable-list .list-item label {
-    flex-grow: 1;
-    cursor: pointer;
-}
-.scrollable-list .list-item input[type="checkbox"] {
-    margin-right: 10px;
-    cursor: pointer;
-}
-.scrollable-list .release-link {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-}
-.scrollable-list .release-link:hover {
-    text-decoration: underline;
-}
-.scrollable-list .release-details {
-    font-size: 0.85rem;
-    color: var(--secondary-color);
-    margin-left: 10px;
+.btn-role:hover {
+    background-color: var(--button-secondary-hover);
 }
 
 
 #downloadProgressContainer {
     margin-top: 15px;
+    margin-bottom: 15px; /* Space it from buttons */
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
 }
-#downloadProgressContainer label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
+#downloadProgressContainer.fade-out {
+    opacity: 0;
 }
+#downloadProgressContainer label { display: block; margin-bottom: 5px; font-weight: 500; }
 #downloadProgressBar {
     width: 100%;
-    height: 15px;
+    height: 12px; /* Slimmer bar */
+    border-radius: 6px;
+    overflow: hidden; /* Ensures inner bar respects border-radius */
+    background-color: var(--border-color); /* Background of the track */
+}
+#downloadProgressBar::-webkit-progress-bar {
+    background-color: var(--border-color);
+    border-radius: 6px;
+}
+#downloadProgressBar::-webkit-progress-value {
+    background-color: var(--progress-bar-bg);
+    border-radius: 6px 0 0 6px; /* Keep left radius, remove right if not full */
+    transition: width 0.1s linear;
+}
+#downloadProgressBar::-moz-progress-bar {
+    background-color: var(--progress-bar-bg);
+    border-radius: 6px;
+}
+#downloadProgressBar[value="100"]::-webkit-progress-value {
+    border-radius: 6px; /* Full radius when complete */
 }
 
-.select-modes-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
 
-.btn-small {
-    padding: 6px 10px;
-    font-size: 0.85rem;
-    height: auto; /* Override fixed height */
+.select-modes-controls { display: flex; gap: 10px; margin-bottom: 10px; }
+.btn-small { /* ... existing ... */ }
+
+.role-definition-popup-content {
+    white-space: pre-wrap; /* Preserve formatting of role definition */
+    font-family: var(--font-family);
+    line-height: 1.6;
 }
 
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .dev-console-sidebar {
-        width: 280px;
-        left: -280px;
-    }
-    
-    body.console-open .main-content {
-        margin-left: 0;
-    }
-    
-    .dev-console-sidebar.open {
-        left: 0;
-        width: 280px;
-    }
-    
-    /* Add an overlay when console is open on mobile */
-    body.console-open::after {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-    }
-
-    .modal-card {
-        max-width: 95%;
-    }
+    .dev-console-sidebar { width: 280px; left: -280px; }
+    body.console-open .main-content { margin-left: 0; }
+    .dev-console-sidebar.open { left: 0; width: 100%; } /* Full width on mobile */
+    body.console-open::after { /* ... existing ... */ }
+    .modal-card { max-width: calc(100% - 20px); margin: 10px; max-height: calc(100vh - 20px); } /* Adjust for smaller screens */
+    .header-controls { justify-content: space-around; } /* Better spacing for header buttons */
 }
 
 @media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-    .container {
-        padding: 15px;
-        margin: 10px auto;
-    }
-    h1 {
-        font-size: 1.5em;
-    }
-    header {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .header-controls {
-        width: 100%;
-        justify-content: center; /* Center buttons on smaller screens */
-        flex-wrap: wrap; /* Allow buttons to wrap */
-    }
-    .category-selector {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 10px;
-    }
-    .mode-display-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    #modeNameDisplay {
-        margin-bottom: 10px;
-    }
-    #copyModeButton {
-        width: 100%;
-    }
+    body { padding: 10px; }
+    .container { padding: 15px; margin: 10px auto; }
+    h1 { font-size: 1.6rem; }
+    header { flex-direction: column; align-items: stretch; gap: 15px; }
+    .header-controls { width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;}
 
-    .modal-header h2 {
-        font-size: 1.2rem;
-    }
-    .modal-btn {
-        font-size: 0.95rem;
-    }
-    .confirm-dialog {
-        padding: 20px;
-    }
-    .confirm-dialog h3 {
-        font-size: 1.1rem;
-    }
-    .confirm-dialog p {
-        font-size: 0.9rem;
-    }
+    .category-selector { /* ... existing ... */ }
+    .mode-display-container { flex-direction: column; align-items: stretch; }
+    #modeNameDisplay { margin-bottom: 10px; }
+    #copyModeButton { width: 100%; }
+
+    .modal-header h2 { font-size: 1.2rem; }
+    .modal-btn { font-size: 0.95rem; }
+    .modal-footer { flex-direction: column; gap: 10px; } /* Stack footer buttons */
+    .modal-footer .btn { width: 100%; }
+    #selectModesFooter .btn:first-child { margin-right: 0; } /* Remove auto margin */
+
+
+    .confirm-dialog { padding: 20px; }
+    .confirm-dialog h3 { font-size: 1.1rem; }
+    .confirm-dialog p { font-size: 0.9rem; }
 }
