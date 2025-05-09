@@ -1,24 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roo Mode Explorer</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Roo Mode Explorer</h1>
+        <header>
+            <h1>Roo Mode Explorer</h1>
+            <div class="theme-toggle">
+                <button id="themeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-sun light-icon"></i>
+                    <i class="fas fa-moon dark-icon"></i>
+                </button>
+            </div>
+        </header>
 
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Search by mode name...">
+        </div>
+
+        <div class="category-container">
+            <div class="category-selector">
+                <button class="category-btn active" data-category="all">All</button>
+                <button class="category-btn" data-category="design">Design</button>
+                <button class="category-btn" data-category="dev">Development</button>
+                <button class="category-btn" data-category="framework">Frameworks</button>
+                <button class="category-btn" data-category="data">Data</button>
+                <button class="category-btn" data-category="infra">Infrastructure</button>
+                <button class="category-btn" data-category="management">Management</button>
+                <button class="category-btn" data-category="agent">Agents</button>
+                <button class="category-btn" data-category="specialist">Specialists</button>
+            </div>
         </div>
 
         <ul id="searchResults">
             <!-- Search results will be populated here -->
         </ul>
         <div id="noResultsMessage" class="no-results" style="display: none;">No modes found.</div>
-
 
         <div class="mode-display-container">
             <span class="mode-label">Mode (Slug):</span>
