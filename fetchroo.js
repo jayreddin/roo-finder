@@ -142,15 +142,117 @@ function saveRooModes(data) {
     }
 }
 
+// Function for force refreshing (to be used from the console)
+async function forceRooModesRefresh() {
+    // Check if developer logger is available
+    const logger = window.devLogger;
+    
+    if (logger) {
+        logger.info('Starting forced refresh from repository');
+    }
+    
+    // Find the latest .roomodes file
+    const latestFile = await findLatestRooModesFile();
+    
+    if (!latestFile) {
+        if (logger) {
+            logger.error('No .roomodes file found in the repository');
+        }
+        return { updated: false, message: 'No .roomodes file found in the repository' };
+    }
+    
+    // Log file details
+    if (logger) {
+        logger.info(`Latest file found: ${latestFile.name} (${new Date(latestFile.updated_at || latestFile.created_at || null).toLocaleString()})`);
+    }
+    
+    // Check if the file is newer than our current data
+    const fileDate = new Date(latestFile.updated_at || latestFile.created_at || null);
+    const lastUpdate = lastUpdateTime ? new Date(lastUpdateTime) : null;
+    
+    let isNewer = !lastUpdate || (fileDate > lastUpdate);
+    
+    if (!isNewer && logger) {
+        logger.warning(`Repository file (${fileDate.toLocaleString()}) is older than local data (${lastUpdate.toLocaleString()})`);
+        logger.info('Continuing with force refresh regardless of timestamps');
+    }
+    
+    // Fetch the content of the latest .roomodes file
+    const content = await fetchFileContent(latestFile.download_url);
+    
+    if (!content) {
+        if (logger) {
+            logger.error('Failed to fetch file content');
+        }
+        return { updated: false, message: 'Failed to fetch file content' };
+    }
+    
+    // Log content details
+    if (logger) {
+        logger.info(`File content fetched (${content.length} bytes)`);
+    }
+    
+    // Parse the content
+    const parsedData = parseRooModesFile(content);
+    
+    if (!parsedData || !parsedData.customModes || parsedData.customModes.length === 0) {
+        if (logger) {
+            logger.error('Failed to parse file content or no modes found');
+        }
+        return { updated: false, message: 'Failed to parse file content or no modes found' };
+    }
+    
+    // Log mode count
+    if (logger) {
+        logger.info(`Parsed ${parsedData.customModes.length} modes from file`);
+    }
+    
+    // Save the new data
+    const saved = saveRooModes(parsedData);
+    
+    if (saved) {
+        // Update the global roomodes data
+        if (window.updateRoomodes) {
+            window.updateRoomodes(parsedData);
+            if (logger) {
+                logger.success('Roomodes data updated in application');
+            }
+        } else {
+            window.roomodesData = parsedData;
+            if (logger) {
+                logger.success('Roomodes data updated globally');
+            }
+        }
+        
+        return { 
+            updated: true, 
+            message: `Successfully updated with ${parsedData.customModes.length} modes from ${latestFile.name}${isNewer ? '' : ' (forced overwrite of newer local data)'}` 
+        };
+    } else {
+        if (logger) {
+            logger.error('Failed to save roomodes data');
+        }
+        return { updated: false, message: 'Failed to save roomodes data' };
+    }
+}
+
+// Make the function available globally
+window.forceRooModesRefresh = forceRooModesRefresh;
+
 // Main function to fetch the latest roomodes
 async function fetchLatestRooModes() {
     const refreshButton = document.getElementById('refreshButton');
+    const logger = window.devLogger;
     
     // Remove any existing animation classes first
     refreshButton.classList.remove('success', 'no-update');
     
     // Add animation class to show the check is in progress
     refreshButton.classList.add('checking');
+    
+    if (logger) {
+        logger.info('Checking for updates from repository');
+    }
     
     // Find the latest .roomodes file
     const latestFile = await findLatestRooModesFile();
@@ -165,7 +267,16 @@ async function fetchLatestRooModes() {
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
         }, 1500);
+        
+        if (logger) {
+            logger.error('No .roomodes file found in the repository');
+        }
         return;
+    }
+    
+    // Log file details if logger is available
+    if (logger) {
+        logger.info(`Latest file found: ${latestFile.name} (${new Date(latestFile.updated_at || latestFile.created_at || null).toLocaleString()})`);
     }
     
     // Check if we need to update based on the file's date
@@ -180,6 +291,10 @@ async function fetchLatestRooModes() {
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
         }, 1500);
+        
+        if (logger) {
+            logger.info(`No update needed. Local data (${lastUpdate.toLocaleString()}) is newer than or equal to repository (${fileDate.toLocaleString()})`);
+        }
         return;
     }
     
@@ -193,7 +308,16 @@ async function fetchLatestRooModes() {
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
         }, 1500);
+        
+        if (logger) {
+            logger.error('Failed to fetch file content');
+        }
         return;
+    }
+    
+    // Log content details if logger is available
+    if (logger) {
+        logger.info(`File content fetched (${content.length} bytes)`);
     }
     
     // Parse the content
@@ -206,7 +330,16 @@ async function fetchLatestRooModes() {
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
         }, 1500);
+        
+        if (logger) {
+            logger.error('Failed to parse file content or no modes found');
+        }
         return;
+    }
+    
+    // Log mode count if logger is available
+    if (logger) {
+        logger.info(`Parsed ${parsedData.customModes.length} modes from file`);
     }
     
     // Save the new data
@@ -226,6 +359,10 @@ async function fetchLatestRooModes() {
         setTimeout(() => {
             refreshButton.classList.remove('success');
         }, 1500);
+        
+        if (logger) {
+            logger.success(`Update successful. ${parsedData.customModes.length} modes loaded from ${latestFile.name}`);
+        }
     } else {
         // Show error animation
         refreshButton.classList.remove('success'); // Ensure no other animation is active
@@ -233,6 +370,10 @@ async function fetchLatestRooModes() {
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
         }, 1500);
+        
+        if (logger) {
+            logger.error('Failed to save roomodes data');
+        }
     }
 }
 
@@ -249,9 +390,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     window.roomodesData = parsedData;
                 }
+                
+                // Log if logger is available
+                if (window.devLogger) {
+                    window.devLogger.info(`Loaded ${parsedData.customModes.length} modes from cache`);
+                    window.devLogger.info(`Last update: ${new Date(lastUpdateTime || "").toLocaleString() || "Unknown"}`);
+                }
             }
         } catch (e) {
             console.error('Error parsing cached roomodes data:', e);
+            if (window.devLogger) {
+                window.devLogger.error(`Failed to parse cached data: ${e.message}`);
+            }
+        }
+    } else {
+        if (window.devLogger) {
+            window.devLogger.info('No cached data found, using default data');
         }
     }
 });
