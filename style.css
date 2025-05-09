@@ -423,4 +423,45 @@ html[data-theme='dark'] .light-icon {
     #copyModeButton {
         width: 100%;
     }
+/* Add this to your existing style.css file */
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-attribution {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    margin-top: 3px;
+}
+
+.header-attribution a {
+    /* Customize the link color here */
+    color: #2ecc71; /* This is a nice green color, but you can use any color you prefer */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.header-attribution a:hover {
+    text-decoration: underline;
+    color: #27ae60; /* Slightly darker green for hover state */
+}
+
+/* For dark mode, we can specify a different color if needed */
+html[data-theme='dark'] .header-attribution a {
+    color: #3cd483; /* Brighter green for dark mode */
+}
+
+html[data-theme='dark'] .header-attribution a:hover {
+    color: #2ecc71; /* Slightly darker on hover */
+}
+
+/* Update the existing header styles to accommodate the new structure */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
 }
