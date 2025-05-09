@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modeDetailsDisplay = document.getElementById('modeDetailsDisplay');
     const copyModeButton = document.getElementById('copyModeButton');
     const themeToggle = document.getElementById('themeToggle');
+    const refreshButton = document.getElementById('refreshButton');
     const categoryButtons = document.querySelectorAll('.category-btn');
     
     // Initialize theme based on user preference or default to light
@@ -24,6 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
+    });
+    
+    // Refresh button functionality
+    refreshButton.addEventListener('click', function() {
+        // Call the fetch function from fetchroo.js
+        fetchLatestRooModes();
     });
     
     // Category filtering functionality
@@ -212,6 +219,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize with data from external file
     roomodes = roomodesData;
+    
+    // Make the roomodes data available to the fetchroo.js script
+    window.updateRoomodes = function(newData) {
+        roomodes = newData;
+        performSearch(searchInput.value); // Refresh the search results
+    };
     
     // Show all modes when first loading
     performSearch('');
