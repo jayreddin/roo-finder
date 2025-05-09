@@ -1,7 +1,6 @@
 /**
  * fullDownload.js - Handles fetching and displaying GitHub releases.
  */
-
 document.addEventListener('DOMContentLoaded', () => {
     const releasesListDiv = document.getElementById('releasesList');
     const progressBar = document.getElementById('downloadProgressBar');
@@ -20,9 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         releasesListDiv.innerHTML = '<p>Loading releases...</p>';
         try {
             const response = await fetch(GITHUB_RELEASES_URL);
-            if (!response.ok) {
-                throw new Error(`GitHub API error: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
             const releases = await response.json();
             if (window.devLogger) window.devLogger.success(`Successfully fetched ${releases.length} releases.`);
             displayReleases(releases);
@@ -34,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayReleases(releases) {
-        releasesListDiv.innerHTML = ''; // Clear loading message
+        releasesListDiv.innerHTML = ''; 
         if (releases.length === 0) {
             releasesListDiv.innerHTML = '<p>No releases found.</p>';
             return;
@@ -50,40 +47,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.href = asset.browser_download_url;
                     link.textContent = asset.name;
                     link.classList.add('release-link');
-                    link.target = '_blank'; // Open in new tab for safety, or download directly
+                    // link.target = '_blank'; // Removed, will use JS download
 
-                    const size = (asset.size / (1024 * 1024)).toFixed(2); // Size in MB
+                    const size = (asset.size / (1024 * 1024)).toFixed(2); 
                     const details = document.createElement('span');
                     details.classList.add('release-details');
                     details.textContent = `${size} MB`;
                     
                     link.addEventListener('click', async (e) => {
-                        e.preventDefault(); // Prevent default navigation
+                        e.preventDefault(); 
                         if (window.devLogger) window.devLogger.info(`Download initiated for ${asset.name}`);
                         progressContainer.style.display = 'block';
+                        progressContainer.classList.remove('fade-out');
                         progressBar.value = 0;
                         
-                        const success = await window.downloadFile(
+                        await window.downloadFile(
                             asset.browser_download_url, 
                             asset.name,
                             (percent) => {
                                 progressBar.value = percent;
-                                if (percent === -1) { // Error case
+                                if (percent === -1) { 
                                      if (window.devLogger) window.devLogger.error(`Download failed for ${asset.name}`);
-                                     // Optionally hide progress bar after a delay or show error
-                                     setTimeout(() => progressContainer.style.display = 'none', 2000);
+                                     setTimeout(() => {
+                                        progressContainer.classList.add('fade-out');
+                                        setTimeout(() => progressContainer.style.display = 'none', 500); // Hide after fade
+                                     }, 2000);
                                 } else if (percent === 100) {
                                     if (window.devLogger) window.devLogger.success(`Download complete for ${asset.name}`);
-                                     // Optionally hide progress bar after a delay
-                                     setTimeout(() => progressContainer.style.display = 'none', 2000);
+                                     setTimeout(() => {
+                                        progressContainer.classList.add('fade-out');
+                                        setTimeout(() => progressContainer.style.display = 'none', 500);
+                                     }, 1000); // Shorter delay for success
                                 }
                             }
                         );
-                        if (!success) {
-                            // Handle failed download initiation if needed (e.g. show a message)
-                        }
                     });
-
                     listItem.appendChild(link);
                     listItem.appendChild(details);
                     releasesListDiv.appendChild(listItem);
@@ -92,10 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Expose init function to be called by customRoomodesUI.js
     window.initFullDownloadView = () => {
         if (window.devLogger) window.devLogger.info('Initializing Full Download View.');
-        progressContainer.style.display = 'none'; // Hide progress bar initially
+        progressContainer.style.display = 'none'; 
+        progressContainer.classList.remove('fade-out');
         progressBar.value = 0;
         fetchReleases();
     };
