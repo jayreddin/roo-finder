@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roo Mode Explorer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Roo Mode Explorer</h1>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by mode name...">
+        </div>
+
+        <ul id="searchResults">
+            <!-- Search results will be populated here -->
+        </ul>
+        <div id="noResultsMessage" class="no-results" style="display: none;">No modes found.</div>
+
+
+        <div class="mode-display-container">
+            <span class="mode-label">Mode (Slug):</span>
+            <div id="modeNameDisplay"></div>
+            <button id="copyModeButton" disabled>Copy</button>
+        </div>
+
+        <div class="details-container" id="modeDetailsDisplay">
+            <!-- Mode details will be displayed here -->
+        </div>
+    </div>
+
+    <script src="roo-commander.json"></script>
+    <script src="script.js"></script>
+</body>
+</html>
