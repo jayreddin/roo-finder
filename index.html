@@ -11,8 +11,11 @@
     <div class="container">
         <header>
             <h1>Roo Mode Explorer</h1>
-            <div class="theme-toggle">
-                <button id="themeToggle" aria-label="Toggle theme">
+            <div class="header-controls">
+                <button id="refreshButton" class="btn-refresh" aria-label="Refresh modes">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button id="themeToggle" class="btn-theme" aria-label="Toggle theme">
                     <i class="fas fa-sun light-icon"></i>
                     <i class="fas fa-moon dark-icon"></i>
                 </button>
@@ -54,6 +57,7 @@
     </div>
 
     <script src="roo-commander.json"></script>
+    <script src="fetchroo.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
