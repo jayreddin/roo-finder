@@ -1,6 +1,6 @@
 /**
  * console.js - Handles the hidden developer console functionality
- * Last updated: 2025-05-09 08:08:13 UTC
+ * Last updated: 2025-05-09 08:38:34 UTC
  * Author: Jamie Reddin (jayreddin)
  */
 
@@ -100,7 +100,7 @@ class ConsoleLogger {
 document.addEventListener('DOMContentLoaded', function() {
     const versionTrigger = document.getElementById('versionTrigger');
     const devConsoleSidebar = document.getElementById('devConsoleSidebar');
-    const closeConsole = document.getElementById('closeConsole');
+    const closeConsoleBtn = document.getElementById('closeConsole');
     const consoleTabs = document.querySelectorAll('.console-tab');
     const tabContents = document.querySelectorAll('.tab-content');
     const clearLogsBtn = document.getElementById('clearLogs');
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Close console handler
-    closeConsole.addEventListener('click', function() {
+    closeConsoleBtn.addEventListener('click', function() {
         closeConsole();
     });
     
@@ -211,92 +211,4 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     });
     
-    // Clear cache button handler
-    clearCacheBtn.addEventListener('click', function() {
-        showConfirmDialog(
-            'Clear Cache',
-            'This will clear all cached data including logs and roomodes data. Continue?',
-            function() { // Yes callback
-                localStorage.removeItem('roomodesData');
-                localStorage.removeItem('lastRooModesUpdateTime');
-                localStorage.removeItem('devConsoleLogs');
-                logger.clear();
-                logger.info('Cache cleared');
-                logger.warning('Please refresh the page to complete the operation');
-            }
-        );
-    });
-    
-    // Export data button handler
-    exportDataBtn.addEventListener('click', function() {
-        try {
-            const exportData = {
-                roomodesData: localStorage.getItem('roomodesData'),
-                lastRooModesUpdateTime: localStorage.getItem('lastRooModesUpdateTime'),
-                theme: localStorage.getItem('theme'),
-                logs: logger.logs,
-                exportTime: new Date().toISOString()
-            };
-            
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "roo-finder-export-" + new Date().toISOString().split('T')[0] + ".json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-            
-            logger.success('Data exported successfully');
-        } catch (e) {
-            logger.error('Failed to export data: ' + e.message);
-        }
-    });
-    
-    // Listen for escape key to close console
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && devConsoleSidebar.classList.contains('open')) {
-            closeConsole();
-        }
-    });
-    
-    // Confirm dialog handlers
-    confirmYes.addEventListener('click', function() {
-        if (confirmModal.yesCallback) {
-            confirmModal.yesCallback();
-        }
-        confirmModal.style.display = 'none';
-    });
-    
-    confirmNo.addEventListener('click', function() {
-        confirmModal.style.display = 'none';
-    });
-    
-    // Click outside to close confirm modal
-    confirmModal.addEventListener('click', function(event) {
-        if (event.target === confirmModal) {
-            confirmModal.style.display = 'none';
-        }
-    });
-    
-    // Initialize logs with app start
-    logger.info('Application initialized');
-    logger.info('App version: V.1.0.0');
-    logger.info(`User logged in: ${new Date().toISOString()}`);
-});
-
-// Confirmation dialog function
-function showConfirmDialog(title, message, yesCallback) {
-    const confirmModal = document.getElementById('confirmModal');
-    
-    if (!confirmModal) return;
-    
-    // Update content
-    document.getElementById('confirm-title').textContent = title;
-    document.getElementById('confirm-message').textContent = message;
-    
-    // Store the callback
-    confirmModal.yesCallback = yesCallback;
-    
-    // Show the modal
-    confirmModal.style.display = 'flex';
-}
+    // Clear
