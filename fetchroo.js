@@ -146,6 +146,9 @@ function saveRooModes(data) {
 async function fetchLatestRooModes() {
     const refreshButton = document.getElementById('refreshButton');
     
+    // Remove any existing animation classes first
+    refreshButton.classList.remove('success', 'no-update');
+    
     // Add animation class to show the check is in progress
     refreshButton.classList.add('checking');
     
@@ -157,6 +160,7 @@ async function fetchLatestRooModes() {
     
     if (!latestFile) {
         // Show error animation
+        refreshButton.classList.remove('success'); // Ensure no other animation is active
         refreshButton.classList.add('no-update');
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
@@ -171,6 +175,7 @@ async function fetchLatestRooModes() {
     // If we have a last update time and the file hasn't changed, no need to update
     if (lastUpdate && fileDate && fileDate <= lastUpdate) {
         // Show "no update needed" animation
+        refreshButton.classList.remove('success'); // Ensure no other animation is active
         refreshButton.classList.add('no-update');
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
@@ -183,6 +188,7 @@ async function fetchLatestRooModes() {
     
     if (!content) {
         // Show error animation
+        refreshButton.classList.remove('success'); // Ensure no other animation is active
         refreshButton.classList.add('no-update');
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
@@ -195,6 +201,7 @@ async function fetchLatestRooModes() {
     
     if (!parsedData || !parsedData.customModes || parsedData.customModes.length === 0) {
         // Show error animation
+        refreshButton.classList.remove('success'); // Ensure no other animation is active
         refreshButton.classList.add('no-update');
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
@@ -214,12 +221,14 @@ async function fetchLatestRooModes() {
         }
         
         // Show success animation
+        refreshButton.classList.remove('no-update'); // Ensure no other animation is active
         refreshButton.classList.add('success');
         setTimeout(() => {
             refreshButton.classList.remove('success');
         }, 1500);
     } else {
         // Show error animation
+        refreshButton.classList.remove('success'); // Ensure no other animation is active
         refreshButton.classList.add('no-update');
         setTimeout(() => {
             refreshButton.classList.remove('no-update');
