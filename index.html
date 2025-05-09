@@ -20,20 +20,14 @@
                 <button class="console-tab active" data-tab="logs">Logs</button>
                 <button class="console-tab" data-tab="actions">Actions</button>
             </div>
-            
             <div class="tab-content" id="logsTab">
-                <div class="console-log-container">
-                    <pre id="consoleLog"></pre>
-                </div>
-                <div class="console-controls">
-                    <button id="clearLogs" class="btn">Clear Logs</button>
-                </div>
+                <div class="console-log-container"><pre id="consoleLog"></pre></div>
+                <div class="console-controls"><button id="clearLogs" class="btn">Clear Logs</button></div>
             </div>
-            
             <div class="tab-content" id="actionsTab" style="display: none;">
                 <div class="action-section">
                     <h3>Force Refresh</h3>
-                    <p>Force download the latest .roomodes file from the repository, even if your local version is newer.</p>
+                    <p>Force download the latest .roomodes file from the repository.</p>
                     <button id="forceRefreshBtn" class="btn">Force Refresh</button>
                 </div>
                 <div class="action-section">
@@ -54,17 +48,17 @@
                 <div class="header-content">
                     <h1>Roo Mode Finder</h1>
                     <div class="header-attribution">
-                        Created by <a href="https://github.com/jayreddin" target="_blank"><span>Jamie Reddin</span></a> ‖ 2025-05-09 ‖ <span id="versionTrigger" class="version-number">V.1.0.0</span>
+                        Created by <a href="https://github.com/jayreddin" target="_blank"><span>Jamie Reddin</span></a> ‖ <span id="versionTrigger" class="version-number">V.1.2.0</span>
                     </div>
                 </div>
                 <div class="header-controls">
                     <button id="customRoomodesBtn" class="btn" aria-label="Custom .roomodes file">
                         <i class="fas fa-cog"></i> Custom Modes
                     </button>
-                    <button id="refreshButton" class="btn-refresh" aria-label="Refresh modes">
+                    <button id="refreshButton" class="btn btn-refresh" aria-label="Refresh modes">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </button>
-                    <button id="themeToggle" class="btn-theme" aria-label="Toggle theme">
+                    <button id="themeToggle" class="btn btn-theme" aria-label="Toggle theme">
                         <i class="fas fa-sun light-icon"></i>
                         <i class="fas fa-moon dark-icon"></i>
                     </button>
@@ -78,31 +72,29 @@
             <div class="category-container">
                 <div class="category-selector">
                     <button class="category-btn active" data-category="all">All</button>
-                    <button class="category-btn" data-category="design">Design</button>
-                    <button class="category-btn" data-category="dev">Development</button>
-                    <button class="category-btn" data-category="framework">Frameworks</button>
-                    <button class="category-btn" data-category="data">Data</button>
-                    <button class="category-btn" data-category="infra">Infrastructure</button>
                     <button class="category-btn" data-category="management">Management</button>
                     <button class="category-btn" data-category="agent">Agents</button>
+                    <button class="category-btn" data-category="plan">Plan</button>
+                    <button class="category-btn" data-category="dev">Development</button>
+                    <button class="category-btn" data-category="design">Design</button>
+                    <button class="category-btn" data-category="debug">Debug</button>
                     <button class="category-btn" data-category="specialist">Specialists</button>
+                    <button class="category-btn" data-category="data">Data</button>
+                    <button class="category-btn" data-category="framework">Frameworks</button>
+                    <button class="category-btn" data-category="infra">Infrastructure</button>
                 </div>
             </div>
 
-            <ul id="searchResults">
-                <!-- Search results will be populated here -->
-            </ul>
+            <ul id="searchResults"></ul>
             <div id="noResultsMessage" class="no-results" style="display: none;">No modes found.</div>
 
             <div class="mode-display-container">
                 <span class="mode-label">Mode (Slug):</span>
                 <div id="modeNameDisplay"></div>
-                <button id="copyModeButton" disabled>Copy</button>
+                <button id="copyModeButton" class="btn" disabled><i class="fas fa-copy"></i> Copy</button>
             </div>
 
-            <div class="details-container" id="modeDetailsDisplay">
-                <!-- Mode details will be displayed here -->
-            </div>
+            <div class="details-container" id="modeDetailsDisplay"></div>
         </div>
     </div>
 
@@ -113,37 +105,62 @@
                 <h2>Custom .roomodes File</h2>
                 <button id="closeCustomRoomodesModal" class="close-modal-btn">&times;</button>
             </div>
-            <div class="modal-content">
+            <div class="modal-body">
                 <!-- Content will be dynamically populated by JS -->
-                <div id="customRoomodesInitialView">
+                <div id="customRoomodesInitialView" class="modal-view">
                     <p>Choose an option to customize your .roomodes file:</p>
                     <button id="downloadFullBtn" class="btn modal-btn">Download Full Releases</button>
                     <button id="selectModesBtn" class="btn modal-btn">Select Specific Modes</button>
                 </div>
-                <div id="downloadFullView" style="display: none;">
+
+                <div id="downloadFullView" class="modal-view" style="display: none;">
                     <h3>Available Releases</h3>
-                    <div id="releasesList" class="scrollable-list">
-                        <!-- Releases will be listed here -->
-                    </div>
+                    <div id="releasesList" class="scrollable-list"></div>
                     <div id="downloadProgressContainer" style="display: none;">
                         <label for="downloadProgressBar">Downloading:</label>
                         <progress id="downloadProgressBar" value="0" max="100"></progress>
                     </div>
-                    <button id="exitDownloadFullBtn" class="btn modal-btn modal-exit-btn">Exit</button>
                 </div>
-                <div id="selectModesView" style="display: none;">
+
+                <div id="selectModesView" class="modal-view" style="display: none;">
                     <h3>Select Modes</h3>
                     <div class="select-modes-controls">
                         <button id="selectAllModesBtn" class="btn btn-small">Select All</button>
                         <button id="deselectAllModesBtn" class="btn btn-small">Deselect All</button>
                     </div>
-                    <div id="modesSelectionList" class="scrollable-list">
-                        <!-- Mode selection checkboxes will be here -->
-                    </div>
-                    <button id="saveSelectedModesBtn" class="btn modal-btn">Save Selections</button>
-                    <button id="downloadCustomFileBtn" class="btn modal-btn" style="display: none;">Download .roomodes</button>
-                    <button id="exitSelectModesBtn" class="btn modal-btn modal-exit-btn">Exit</button>
+                    <div id="modesSelectionList" class="scrollable-list"></div>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <!-- Footer for Download Full View -->
+                <div id="downloadFullFooter" style="display: none;">
+                    <button id="exitDownloadFullBtn" class="btn btn-secondary"><i class="fas fa-times-circle"></i> Exit</button>
+                    <!-- Download button for releases - functionality to be clarified
+                    <button id="downloadSelectedReleasesBtn" class="btn" disabled><i class="fas fa-download"></i> Download Selected</button> 
+                    -->
+                </div>
+                <!-- Footer for Select Modes View -->
+                <div id="selectModesFooter" style="display: none;">
+                    <button id="saveSelectedModesBtn" class="btn"><i class="fas fa-save"></i> Save Selections</button>
+                    <button id="downloadCustomFileBtn" class="btn" style="display: none;"><i class="fas fa-download"></i> Download .roomodes</button>
+                    <button id="exitSelectModesBtn" class="btn btn-secondary"><i class="fas fa-times-circle"></i> Exit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Definition Pop-up Modal -->
+    <div id="roleDefinitionModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="roleDefinitionModalTitle">Role Definition</h2>
+                <button id="closeRoleDefinitionModalBtn" class="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="roleDefinitionModalContent" class="role-definition-popup-content scrollable-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="backRoleDefinitionModalBtn" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</button>
             </div>
         </div>
     </div>
@@ -164,11 +181,10 @@
     <script src="fetchroo.js"></script>
     <script src="script.js"></script>
     <script src="console.js"></script>
-    <!-- New JS files for the custom .roomodes feature -->
     <script src="fetchFileDownload.js"></script>
     <script src="rooFileMaker.js"></script>
     <script src="fullDownload.js"></script>
     <script src="selectModes.js"></script>
-    <script src="customRoomodesUI.js"></script> <!-- Main handler for the new UI -->
+    <script src="customRoomodesUI.js"></script>
 </body>
 </html>
