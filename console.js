@@ -1,5 +1,7 @@
 /**
  * console.js - Handles the hidden developer console functionality
+ * Last updated: 2025-05-09 08:08:13 UTC
+ * Author: Jamie Reddin (jayreddin)
  */
 
 // Initialize logger
@@ -75,7 +77,11 @@ class ConsoleLogger {
             
             const timestamp = document.createElement('span');
             timestamp.className = 'log-timestamp';
-            timestamp.textContent = new Date(log.timestamp).toLocaleTimeString();
+            
+            // Format the timestamp to a nice format (HH:MM:SS AM/PM)
+            const date = new Date(log.timestamp);
+            const formattedTime = date.toLocaleTimeString([], {hour: 'numeric', minute:'2-digit', second:'2-digit', hour12: true});
+            timestamp.textContent = formattedTime;
             
             const message = document.createTextNode(log.message);
             
@@ -93,7 +99,7 @@ class ConsoleLogger {
 // Initialize the console
 document.addEventListener('DOMContentLoaded', function() {
     const versionTrigger = document.getElementById('versionTrigger');
-    const consoleModal = document.getElementById('consoleModal');
+    const devConsoleSidebar = document.getElementById('devConsoleSidebar');
     const closeConsole = document.getElementById('closeConsole');
     const consoleTabs = document.querySelectorAll('.console-tab');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -101,6 +107,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const forceRefreshBtn = document.getElementById('forceRefreshBtn');
     const clearCacheBtn = document.getElementById('clearCacheBtn');
     const exportDataBtn = document.getElementById('exportDataBtn');
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmYes = document.getElementById('confirmYes');
+    const confirmNo = document.getElementById('confirmNo');
     
     // Create logger instance
     const logger = new ConsoleLogger();
@@ -125,15 +134,31 @@ document.addEventListener('DOMContentLoaded', function() {
             clickCount = 0;
             
             // Show the console
-            consoleModal.style.display = 'flex';
-            logger.info('Developer console opened');
+            openConsole();
         }
     });
     
+    // Function to open console
+    function openConsole() {
+        devConsoleSidebar.classList.add('open');
+        document.body.classList.add('console-open');
+        logger.info('Developer console opened');
+    }
+    
+    // Function to close console
+    function closeConsole() {
+        devConsoleSidebar.classList.remove('open');
+        document.body.classList.remove('console-open');
+        
+        // Make sure to hide any modals
+        confirmModal.style.display = 'none';
+        
+        logger.info('Developer console closed');
+    }
+    
     // Close console handler
     closeConsole.addEventListener('click', function() {
-        consoleModal.style.display = 'none';
-        logger.info('Developer console closed');
+        closeConsole();
     });
     
     // Tab switching
@@ -229,64 +254,45 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Listen for escape key to close console
     document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && consoleModal.style.display === 'flex') {
-            consoleModal.style.display = 'none';
-            logger.info('Developer console closed (Escape key)');
+        if (event.key === 'Escape' && devConsoleSidebar.classList.contains('open')) {
+            closeConsole();
         }
     });
     
-    // Click outside to close console
-    consoleModal.addEventListener('click', function(event) {
-        if (event.target === consoleModal) {
-            consoleModal.style.display = 'none';
-            logger.info('Developer console closed (outside click)');
+    // Confirm dialog handlers
+    confirmYes.addEventListener('click', function() {
+        if (confirmModal.yesCallback) {
+            confirmModal.yesCallback();
+        }
+        confirmModal.style.display = 'none';
+    });
+    
+    confirmNo.addEventListener('click', function() {
+        confirmModal.style.display = 'none';
+    });
+    
+    // Click outside to close confirm modal
+    confirmModal.addEventListener('click', function(event) {
+        if (event.target === confirmModal) {
+            confirmModal.style.display = 'none';
         }
     });
     
     // Initialize logs with app start
     logger.info('Application initialized');
     logger.info('App version: V.1.0.0');
+    logger.info(`User logged in: ${new Date().toISOString()}`);
 });
 
 // Confirmation dialog function
 function showConfirmDialog(title, message, yesCallback) {
-    // Create modal if it doesn't exist
-    let confirmModal = document.querySelector('.confirm-modal');
+    const confirmModal = document.getElementById('confirmModal');
     
-    if (!confirmModal) {
-        confirmModal = document.createElement('div');
-        confirmModal.className = 'confirm-modal';
-        confirmModal.innerHTML = `
-            <div class="confirm-dialog">
-                <h3 id="confirm-title"></h3>
-                <p id="confirm-message"></p>
-                <div class="confirm-actions">
-                    <button class="btn btn-no">No</button>
-                    <button class="btn btn-yes">Yes</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(confirmModal);
-        
-        // Set up event listeners
-        const btnNo = confirmModal.querySelector('.btn-no');
-        const btnYes = confirmModal.querySelector('.btn-yes');
-        
-        btnNo.addEventListener('click', function() {
-            confirmModal.style.display = 'none';
-        });
-        
-        btnYes.addEventListener('click', function() {
-            if (confirmModal.yesCallback) {
-                confirmModal.yesCallback();
-            }
-            confirmModal.style.display = 'none';
-        });
-    }
+    if (!confirmModal) return;
     
     // Update content
-    confirmModal.querySelector('#confirm-title').textContent = title;
-    confirmModal.querySelector('#confirm-message').textContent = message;
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-message').textContent = message;
     
     // Store the callback
     confirmModal.yesCallback = yesCallback;
