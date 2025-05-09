@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roo Finder</title>
+    <title>Roo Mode Explorer</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -11,9 +11,9 @@
     <div class="container">
         <header>
             <div class="header-content">
-                <h1>Roo Finder</h1>
+                <h1>Roo Mode Explorer</h1>
                 <div class="header-attribution">
-                    Created by <a href="https://github.com/jayreddin" target="_blank"><span>Jamie Reddin</span></a> ‖ 2025-05-09 ‖ V.1.0.0
+                    Created by <a href="https://github.com/jayreddin" target="_blank"><span>Jamie Reddin</span></a> ‖ 2025-05-09 ‖ <span id="versionTrigger" class="version-number">V.1.0.0</span>
                 </div>
             </div>
             <div class="header-controls">
@@ -60,9 +60,49 @@
             <!-- Mode details will be displayed here -->
         </div>
     </div>
+    
+    <!-- Hidden Console Modal -->
+    <div id="consoleModal" class="console-modal">
+        <div class="console-content">
+            <div class="console-header">
+                <h2>Developer Console</h2>
+                <button id="closeConsole" class="close-btn">&times;</button>
+            </div>
+            <div class="console-body">
+                <div class="console-tabs">
+                    <button class="console-tab active" data-tab="logs">Logs</button>
+                    <button class="console-tab" data-tab="actions">Actions</button>
+                </div>
+                
+                <div class="tab-content" id="logsTab">
+                    <div class="console-log-container">
+                        <pre id="consoleLog"></pre>
+                    </div>
+                    <div class="console-controls">
+                        <button id="clearLogs" class="btn">Clear Logs</button>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="actionsTab" style="display: none;">
+                    <div class="action-section">
+                        <h3>Force Refresh</h3>
+                        <p>Force download the latest .roomodes file from the repository, even if your local version is newer.</p>
+                        <button id="forceRefreshBtn" class="btn">Force Refresh</button>
+                    </div>
+                    <div class="action-section">
+                        <h3>Local Storage Management</h3>
+                        <p>Manage cached data and settings.</p>
+                        <button id="clearCacheBtn" class="btn">Clear Cache</button>
+                        <button id="exportDataBtn" class="btn">Export Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="roo-commander.json"></script>
     <script src="fetchroo.js"></script>
     <script src="script.js"></script>
+    <script src="console.js"></script>
 </body>
 </html>
